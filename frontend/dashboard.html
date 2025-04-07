@@ -1,133 +1,107 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Dashboard | WR Móveis e Refrigeração</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="../css/dashboard.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard - WR Móveis</title>
+  <link rel="stylesheet" href="../CSS/dashboard.css" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
 </head>
 <body>
 
   <!-- Sidebar -->
-  <div class="d-flex" id="wrapper">
-    <div class="bg-dark text-white border-end" id="sidebar-wrapper">
-      <div class="sidebar-heading p-3">WR Admin</div>
-      <div class="list-group list-group-flush">
-        <a href="#" class="list-group-item list-group-item-action bg-dark text-white">Dashboard</a>
-        <a href="#" class="list-group-item list-group-item-action bg-dark text-white">Clientes</a>
-        <a href="#" class="list-group-item list-group-item-action bg-dark text-white">Orçamentos</a>
-        <a href="#" class="list-group-item list-group-item-action bg-dark text-white">Contratos</a>
-        <a href="#" class="list-group-item list-group-item-action bg-dark text-white">Estoque</a>
-        <a href="#" class="list-group-item list-group-item-action bg-dark text-white">Logística</a>
-        <a href="#" class="list-group-item list-group-item-action bg-dark text-white">Livro Caixa</a>
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <img src="logo.png" alt="Logo" class="sidebar-logo" />
+      <h3>WR Painel</h3>
+    </div>
+    <ul class="sidebar-menu">
+      <li class="active"><a href="#"><i class="bi bi-speedometer2"></i>Dashboard</a></li>
+      <li><a href="#"><i class="bi bi-people"></i>Clientes</a></li>
+      <li><a href="#"><i class="bi bi-file-earmark-text"></i>Orçamentos</a></li>
+      <li><a href="#"><i class="bi bi-journal"></i>Contratos</a></li>
+      <li><a href="#"><i class="bi bi-archive"></i>Estoque</a></li>
+      <li><a href="#"><i class="bi bi-truck"></i>Logística</a></li>
+      <li><a href="#"><i class="bi bi-cash-coin"></i>Livro Caixa</a></li>
+    </ul>
+  </aside>
+
+  <!-- Conteúdo -->
+  <main class="content">
+    <!-- Topbar -->
+    <div class="topbar">
+      <button id="sidebarToggle"><i class="bi bi-list"></i></button>
+      <div class="user-profile">
+        <span class="user-name">Administrador</span>
+        <img src="avatar.jpg" alt="Usuário" />
       </div>
     </div>
 
-    <!-- Page Content -->
-    <div id="page-content-wrapper" class="w-100">
-
-      <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom px-4">
-        <h5 class="m-0">Painel Administrativo</h5>
-      </nav>
-
-      <div class="container-fluid mt-4">
-        <!-- Estatísticas -->
-        <div class="row g-3">
-          <div class="col-md-3">
-            <div class="card text-white bg-primary">
-              <div class="card-body">
-                <h5 class="card-title">Clientes</h5>
-                <p class="card-text" id="total-clientes">0</p>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-3">
-            <div class="card text-white bg-success">
-              <div class="card-body">
-                <h5 class="card-title">Orçamentos</h5>
-                <p class="card-text">0</p>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-3">
-            <div class="card text-white bg-warning">
-              <div class="card-body">
-                <h5 class="card-title">Estoque</h5>
-                <p class="card-text">0</p>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-3">
-            <div class="card text-white bg-danger">
-              <div class="card-body">
-                <h5 class="card-title">Financeiro</h5>
-                <p class="card-text">R$ 0,00</p>
-              </div>
+    <div class="container-fluid p-4">
+      <!-- Cards Estatísticas -->
+      <div class="row g-4">
+        <div class="col-md-4">
+          <div class="card">
+            <div class="card-header">Clientes</div>
+            <div class="card-body">
+              <h4 id="clientes-count">0</h4>
+              <p>Clientes cadastrados</p>
             </div>
           </div>
         </div>
-
-        <!-- Lista de Clientes -->
-        <div class="mt-5">
-          <div class="d-flex justify-content-between align-items-center">
-            <h4>Clientes Cadastrados</h4>
-            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalCliente">Novo Cliente</button>
+        <div class="col-md-4">
+          <div class="card">
+            <div class="card-header">Orçamentos</div>
+            <div class="card-body">
+              <h4 id="orcamentos-count">0</h4>
+              <p>Orçamentos realizados</p>
+            </div>
           </div>
-          <table class="table table-bordered table-striped mt-3">
-            <thead class="table-dark">
+        </div>
+        <div class="col-md-4">
+          <div class="card">
+            <div class="card-header">Contratos</div>
+            <div class="card-body">
+              <h4 id="contratos-count">0</h4>
+              <p>Contratos ativos</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tabela de Últimos Clientes -->
+      <div class="card mt-4">
+        <div class="card-header">Últimos Clientes</div>
+        <div class="card-body table-responsive">
+          <table class="table table-striped">
+            <thead>
               <tr>
                 <th>Nome</th>
                 <th>Telefone</th>
-                <th>E-mail</th>
+                <th>Email</th>
                 <th>Ações</th>
               </tr>
             </thead>
-            <tbody id="lista-clientes"></tbody>
+            <tbody id="clientes-tbody">
+              <!-- Conteúdo inserido via JS -->
+            </tbody>
           </table>
         </div>
       </div>
+    </div>
+  </main>
 
+  <!-- Toasts -->
+  <div class="toast-container position-fixed top-0 end-0 p-3">
+    <div class="toast toast-success" role="alert" id="toastSuccess">
+      <div class="toast-header">Sucesso</div>
+      <div class="toast-body">Ação realizada com sucesso!</div>
     </div>
   </div>
 
-  <!-- Modal Cliente -->
-  <div class="modal fade" id="modalCliente" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
-      <form class="modal-content" id="form-cliente">
-        <div class="modal-header">
-          <h5 class="modal-title">Cadastrar Cliente</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-        </div>
-        <div class="modal-body">
-          <div class="mb-3">
-            <label>Nome</label>
-            <input type="text" class="form-control" required id="nome">
-          </div>
-          <div class="mb-3">
-            <label>Telefone</label>
-            <input type="text" class="form-control" required id="telefone">
-          </div>
-          <div class="mb-3">
-            <label>Email</label>
-            <input type="email" class="form-control" required id="email">
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="submit" class="btn btn-success">Salvar</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- Toast -->
-  <div class="toast-container position-fixed bottom-0 end-0 p-3">
-    <div class="toast bg-success text-white" id="toastSucesso">
-      <div class="toast-body">Cliente cadastrado com sucesso!</div>
-    </div>
-  </div>
-
+  <script src="../js/dashboard.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="script.js"></script>
 </body>
 </html>
