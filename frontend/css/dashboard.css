@@ -413,3 +413,6 @@ body {
 .input-group button:hover {
   background-color: var(--primary-dark);
 }
+.content .container-fluid {
+  padding-top: 30px;
+}
