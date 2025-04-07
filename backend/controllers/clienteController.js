@@ -1,28 +1,37 @@
-const Cliente = require('../models/Cliente');
+const ClienteModel = require('../models/clienteModel');
 
-// Obter todos os clientes
-exports.getAllClientes = async (req, res) => {
+exports.listar = async (req, res) => {
   try {
-    const clientes = await Cliente.find();
+    const clientes = await ClienteModel.listarTodos();
     res.json(clientes);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({ erro: err.message });
   }
 };
 
-// Criar um novo cliente
-exports.createCliente = async (req, res) => {
-  const cliente = new Cliente({
-    nome: req.body.nome,
-    email: req.body.email,
-    telefone: req.body.telefone,
-    endereco: req.body.endereco
-  });
-
+exports.criar = async (req, res) => {
   try {
-    const novoCliente = await cliente.save();
-    res.status(201).json(novoCliente);
+    const novoId = await ClienteModel.criar(req.body);
+    res.status(201).json({ id: novoId });
   } catch (err) {
-    res.status(400).json({ message: err.message });
+    res.status(500).json({ erro: err.message });
+  }
+};
+
+exports.atualizar = async (req, res) => {
+  try {
+    await ClienteModel.atualizar(req.params.id, req.body);
+    res.sendStatus(204);
+  } catch (err) {
+    res.status(500).json({ erro: err.message });
+  }
+};
+
+exports.excluir = async (req, res) => {
+  try {
+    await ClienteModel.excluir(req.params.id);
+    res.sendStatus(204);
+  } catch (err) {
+    res.status(500).json({ erro: err.message });
   }
 };
