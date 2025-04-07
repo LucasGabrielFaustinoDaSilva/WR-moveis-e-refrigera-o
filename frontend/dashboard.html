@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dashboard - WR Móveis</title>
-  <link rel="stylesheet" href="../CSS/dashboard.css" />
+  <link rel="stylesheet" href="../css/dashboard.css" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
@@ -46,7 +46,7 @@
           <div class="card">
             <div class="card-header">Clientes</div>
             <div class="card-body">
-              <h4 id="clientes-count">0</h4>
+              <h4 id="totalClientes">0</h4>
               <p>Clientes cadastrados</p>
             </div>
           </div>
@@ -55,7 +55,7 @@
           <div class="card">
             <div class="card-header">Orçamentos</div>
             <div class="card-body">
-              <h4 id="orcamentos-count">0</h4>
+              <h4 id="totalOrcamentos">0</h4>
               <p>Orçamentos realizados</p>
             </div>
           </div>
@@ -64,17 +64,21 @@
           <div class="card">
             <div class="card-header">Contratos</div>
             <div class="card-body">
-              <h4 id="contratos-count">0</h4>
+              <h4 id="totalContratos">0</h4>
               <p>Contratos ativos</p>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Tabela de Últimos Clientes -->
+      <!-- Lista de Clientes -->
       <div class="card mt-4">
         <div class="card-header">Últimos Clientes</div>
         <div class="card-body table-responsive">
+
+          <input type="text" id="pesquisaClientes" class="form-control mb-3" placeholder="Buscar clientes...">
+          <button class="btn btn-primary mb-3" onclick="abrirModal()">Novo Cliente</button>
+
           <table class="table table-striped">
             <thead>
               <tr>
@@ -84,14 +88,60 @@
                 <th>Ações</th>
               </tr>
             </thead>
-            <tbody id="clientes-tbody">
-              <!-- Conteúdo inserido via JS -->
+            <tbody id="clientesBody">
+              <!-- Preenchido via JS -->
             </tbody>
           </table>
         </div>
       </div>
     </div>
   </main>
+
+  <!-- Modal de Cliente -->
+  <div class="modal fade" id="clienteModal" tabindex="-1">
+    <div class="modal-dialog">
+      <form id="clienteForm" class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Cadastro de Cliente</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="clienteId">
+          <div class="mb-3">
+            <label for="clienteNome">Nome</label>
+            <input type="text" id="clienteNome" class="form-control" required>
+          </div>
+          <div class="mb-3">
+            <label for="clienteEmail">Email</label>
+            <input type="email" id="clienteEmail" class="form-control" required>
+          </div>
+          <div class="mb-3">
+            <label for="clienteTelefone">Telefone</label>
+            <input type="text" id="clienteTelefone" class="form-control">
+          </div>
+          <div class="mb-3">
+            <label for="clienteDocumento">CPF/CNPJ</label>
+            <input type="text" id="clienteDocumento" class="form-control">
+          </div>
+          <div class="mb-3">
+            <label for="clienteCEP">CEP</label>
+            <input type="text" id="clienteCEP" class="form-control">
+          </div>
+          <div class="mb-3">
+            <label for="clienteStatus">Status</label>
+            <select id="clienteStatus" class="form-control">
+              <option value="ativo">Ativo</option>
+              <option value="inativo">Inativo</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" id="salvarCliente" class="btn btn-success">Salvar</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
 
   <!-- Toasts -->
   <div class="toast-container position-fixed top-0 end-0 p-3">
