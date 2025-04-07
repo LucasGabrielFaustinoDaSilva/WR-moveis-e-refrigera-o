@@ -223,4 +223,9 @@ document.addEventListener('DOMContentLoaded', () => {
   // Disponibiliza funções para os botões inline
   window.editarCliente = editarCliente;
   window.excluirCliente = excluirCliente;
+  window.abrirModal = () => {
+  campos.id.value = '';
+  form.reset();
+  modal.show();
+};
 });
