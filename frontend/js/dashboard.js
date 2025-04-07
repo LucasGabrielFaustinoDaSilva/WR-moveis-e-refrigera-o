@@ -1,54 +1,99 @@
-document.addEventListener('DOMContentLoaded', function() {
-  // Verificar autenticação
-  if (!localStorage.getItem('usuarioLogado')) {
-    window.location.href = 'login.html';
-  }
+document.addEventListener('DOMContentLoaded', () => {
+  const clientes = JSON.parse(localStorage.getItem('clientes')) || [];
 
-  // Dados de exemplo (substituir por dados reais)
-  let clientes = JSON.parse(localStorage.getItem('clientes')) || [
-    {
-      id: 1,
-      nome: "João Silva",
-      email: "joao@exemplo.com",
-      telefone: "(11) 98765-4321",
-      documento: "123.456.789-00",
-      endereco: "Rua Exemplo, 123 - Centro",
-      cidade: "São Paulo",
-      estado: "SP",
-      cep: "01000-000",
-      status: "ativo",
-      dataCadastro: "2023-01-15"
-    },
-    // Adicione mais clientes de exemplo conforme necessário
-  ];
-
-  // Elementos do DOM
+  const form = document.getElementById('clienteForm');
   const clientesBody = document.getElementById('clientesBody');
-  const totalClientes = document.getElementById('totalClientes');
-  const totalOrcamentos = document.getElementById('totalOrcamentos');
-  const totalPedidos = document.getElementById('totalPedidos');
-  const totalPendentes = document.getElementById('totalPendentes');
-  
-  // Inicialização
-  atualizarEstatisticas();
-  renderizarClientes();
+  const pesquisaInput = document.getElementById('pesquisaClientes');
+  const modal = new bootstrap.Modal(document.getElementById('clienteModal'));
+  const btnSalvar = document.getElementById('salvarCliente');
 
-  // Atualizar estatísticas
-  function atualizarEstatisticas() {
-    totalClientes.textContent = clientes.length;
-    totalOrcamentos.textContent = "24"; // Exemplo
-    totalPedidos.textContent = "18"; // Exemplo
-    totalPendentes.textContent = "5"; // Exemplo
-    
-    // Salvar no localStorage
-    localStorage.setItem('clientes', JSON.stringify(clientes));
+  // Campos do formulário
+  const campos = {
+    id: document.getElementById('clienteId'),
+    nome: document.getElementById('clienteNome'),
+    email: document.getElementById('clienteEmail'),
+    telefone: document.getElementById('clienteTelefone'),
+    documento: document.getElementById('clienteDocumento'),
+    cep: document.getElementById('clienteCEP'),
+    status: document.getElementById('clienteStatus')
+  };
+
+  atualizarEstatisticas();
+  renderizarClientes(clientes);
+  configurarMascaras();
+  configurarEventosGlobais();
+
+  form.addEventListener('submit', salvarCliente);
+  pesquisaInput.addEventListener('input', filtrarClientes);
+
+  function salvarCliente(e) {
+    e.preventDefault();
+
+    const id = campos.id.value;
+    const novoCliente = {
+      id: id || Date.now().toString(),
+      nome: campos.nome.value.trim(),
+      email: campos.email.value.trim(),
+      telefone: campos.telefone.value.trim(),
+      documento: campos.documento.value.trim(),
+      cep: campos.cep.value.trim(),
+      status: campos.status.value
+    };
+
+    if (id) {
+      const index = clientes.findIndex(c => c.id === id);
+      if (index !== -1) {
+        clientes[index] = novoCliente;
+        mostrarToast('Cliente atualizado com sucesso!');
+      }
+    } else {
+      clientes.push(novoCliente);
+      mostrarToast('Cliente cadastrado com sucesso!');
+    }
+
+    salvarClientes();
+    renderizarClientes(clientes);
+    modal.hide();
+    form.reset();
+    campos.id.value = '';
   }
 
-  // Renderizar lista de clientes
-  function renderizarClientes(clientesFiltrados = clientes) {
+  function editarCliente(id) {
+    const cliente = clientes.find(c => c.id === id);
+    if (cliente) {
+      campos.id.value = cliente.id;
+      campos.nome.value = cliente.nome;
+      campos.email.value = cliente.email;
+      campos.telefone.value = cliente.telefone;
+      campos.documento.value = cliente.documento;
+      campos.cep.value = cliente.cep;
+      campos.status.value = cliente.status;
+
+      modal.show();
+    }
+  }
+
+  function excluirCliente(id) {
+    const index = clientes.findIndex(c => c.id === id);
+    if (index !== -1) {
+      if (confirm('Tem certeza que deseja excluir este cliente?')) {
+        clientes.splice(index, 1);
+        mostrarToast('Cliente excluído com sucesso!', 'warning');
+        salvarClientes();
+        renderizarClientes(clientes);
+      }
+    }
+  }
+
+  function salvarClientes() {
+    localStorage.setItem('clientes', JSON.stringify(clientes));
+    atualizarEstatisticas();
+  }
+
+  function renderizarClientes(lista) {
     clientesBody.innerHTML = '';
-    
-    if (clientesFiltrados.length === 0) {
+
+    if (lista.length === 0) {
       clientesBody.innerHTML = `
         <tr>
           <td colspan="5" class="text-center py-5">
@@ -62,8 +107,8 @@ document.addEventListener('DOMContentLoaded', function() {
       `;
       return;
     }
-    
-    clientesFiltrados.forEach(cliente => {
+
+    lista.forEach(cliente => {
       const tr = document.createElement('tr');
       tr.innerHTML = `
         <td>
@@ -83,15 +128,15 @@ document.addEventListener('DOMContentLoaded', function() {
         <td>${cliente.documento}</td>
         <td>
           <span class="badge ${cliente.status === 'ativo' ? 'bg-success' : 'bg-secondary'}">
-            ${cliente.status === 'ativo' ? 'Ativo' : 'Inativo'}
+            ${cliente.status}
           </span>
         </td>
         <td>
           <div class="d-flex">
-            <button class="btn btn-sm btn-outline-primary edit-btn me-2" data-id="${cliente.id}">
+            <button class="btn btn-sm btn-outline-primary me-2" onclick="editarCliente('${cliente.id}')">
               <i class="fas fa-edit"></i>
             </button>
-            <button class="btn btn-sm btn-outline-danger delete-btn" data-id="${cliente.id}">
+            <button class="btn btn-sm btn-outline-danger" onclick="excluirCliente('${cliente.id}')">
               <i class="fas fa-trash"></i>
             </button>
           </div>
@@ -99,112 +144,83 @@ document.addEventListener('DOMContentLoaded', function() {
       `;
       clientesBody.appendChild(tr);
     });
-    
-    // Adicionar eventos aos botões
-    document.querySelectorAll('.edit-btn').forEach(btn => {
-      btn.addEventListener('click', () => editarCliente(btn.dataset.id));
-    });
-    
-    document.querySelectorAll('.delete-btn').forEach(btn => {
-      btn.addEventListener('click', () => prepararExclusao(btn.dataset.id));
-    });
   }
 
-  // Pesquisar clientes
-  document.getElementById('pesquisaClientes').addEventListener('input', function() {
-    const termo = this.value.toLowerCase();
-    const clientesFiltrados = clientes.filter(cliente => 
-      cliente.nome.toLowerCase().includes(termo) || 
+  function filtrarClientes() {
+    const termo = pesquisaInput.value.toLowerCase();
+    const filtrados = clientes.filter(cliente =>
+      cliente.nome.toLowerCase().includes(termo) ||
       cliente.email.toLowerCase().includes(termo) ||
       cliente.telefone.includes(termo) ||
       cliente.documento.includes(termo)
     );
-    renderizarClientes(clientesFiltrados);
-  });
-
-  // Configurar máscaras
-  function configurarMascaras() {
-    // Máscara para telefone
-    const telefoneInput = document.getElementById('clienteTelefone');
-    telefoneInput.addEventListener('input', function(e) {
-      let value = e.target.value.replace(/\D/g, '');
-      
-      if (value.length > 11) {
-        value = value.substring(0, 11);
-      }
-      
-      if (value.length <= 10) {
-        value = value.replace(/(\d{2})(\d{4})(\d{4})/, '($1) $2-$3');
-      } else {
-        value = value.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
-      }
-      
-      e.target.value = value;
-    });
-    
-    // Máscara para CPF/CNPJ
-    const documentoInput = document.getElementById('clienteDocumento');
-    documentoInput.addEventListener('input', function(e) {
-      let value = e.target.value.replace(/\D/g, '');
-      
-      if (value.length <= 11) {
-        value = value.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
-      } else {
-        value = value.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '$1.$2.$3/$4-$5');
-      }
-      
-      e.target.value = value.substring(0, 18);
-    });
-    
-    // Máscara para CEP
-    const cepInput = document.getElementById('clienteCEP');
-    cepInput.addEventListener('input', function(e) {
-      let value = e.target.value.replace(/\D/g, '');
-      value = value.replace(/^(\d{5})(\d)/, '$1-$2');
-      e.target.value = value.substring(0, 9);
-    });
+    renderizarClientes(filtrados);
   }
 
-  // Mostrar toast de notificação
-  function mostrarToast(mensagem, tipo = 'success') {
+  function atualizarEstatisticas() {
+    document.getElementById('totalClientes').textContent = clientes.length;
+    document.getElementById('totalOrcamentos').textContent = '24';
+    document.getElementById('totalPedidos').textContent = '18';
+    document.getElementById('totalPendentes').textContent = '5';
+  }
+
+  function mostrarToast(msg, tipo = 'success') {
     const toastHTML = `
       <div class="toast show align-items-center text-white bg-${tipo} border-0" role="alert" aria-live="assertive" aria-atomic="true">
         <div class="d-flex">
           <div class="toast-body">
             <i class="fas ${tipo === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'} me-2"></i>
-            ${mensagem}
+            ${msg}
           </div>
           <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
         </div>
       </div>
     `;
-    
-    const toastContainer = document.querySelector('.toast-container');
-    const toastElement = document.createElement('div');
-    toastElement.innerHTML = toastHTML;
-    toastContainer.appendChild(toastElement);
-    
-    // Remover toast após 5 segundos
-    setTimeout(() => {
-      toastElement.remove();
-    }, 5000);
+    const container = document.querySelector('.toast-container');
+    const toast = document.createElement('div');
+    toast.innerHTML = toastHTML;
+    container.appendChild(toast);
+
+    setTimeout(() => toast.remove(), 5000);
   }
 
-  // Logout
-  document.getElementById('logout').addEventListener('click', function() {
-    localStorage.removeItem('usuarioLogado');
-    window.location.href = 'login.html';
-  });
+  function configurarMascaras() {
+    const mascara = (campo, tipo) => {
+      campo.addEventListener('input', e => {
+        let v = e.target.value.replace(/\D/g, '');
+        if (tipo === 'telefone') {
+          v = v.length <= 10
+            ? v.replace(/(\d{2})(\d{4})(\d{0,4})/, '($1) $2-$3')
+            : v.replace(/(\d{2})(\d{5})(\d{0,4})/, '($1) $2-$3');
+        } else if (tipo === 'cpfcnpj') {
+          v = v.length <= 11
+            ? v.replace(/(\d{3})(\d{3})(\d{3})(\d{0,2})/, '$1.$2.$3-$4')
+            : v.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{0,2})/, '$1.$2.$3/$4-$5');
+        } else if (tipo === 'cep') {
+          v = v.replace(/(\d{5})(\d{0,3})/, '$1-$2');
+        }
+        e.target.value = v;
+      });
+    };
 
-  // Toggle sidebar em dispositivos móveis
-  document.getElementById('sidebarToggle').addEventListener('click', function() {
-    document.querySelector('.sidebar').classList.toggle('active');
-    document.querySelector('.content').classList.toggle('active');
-  });
+    mascara(campos.telefone, 'telefone');
+    mascara(campos.documento, 'cpfcnpj');
+    mascara(campos.cep, 'cep');
+  }
 
-  // Inicializar máscaras
-  configurarMascaras();
+  function configurarEventosGlobais() {
+    document.getElementById('logout').addEventListener('click', () => {
+      localStorage.removeItem('usuarioLogado');
+      window.location.href = 'login.html';
+    });
 
-  // Mostrar mensagem de boas-vindas
-  mostrarToast('Bem-vindo ao Painel Administrativo!');
+    document.getElementById('sidebarToggle').addEventListener('click', () => {
+      document.querySelector('.sidebar').classList.toggle('active');
+      document.querySelector('.content').classList.toggle('active');
+    });
+  }
+
+  // Disponibiliza funções para os botões inline
+  window.editarCliente = editarCliente;
+  window.excluirCliente = excluirCliente;
 });
