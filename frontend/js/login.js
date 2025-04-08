@@ -1,12 +1,8 @@
 document.addEventListener('DOMContentLoaded', function() {
   const loginForm = document.getElementById('loginForm');
 
-  // Só redireciona se estiver logado corretamente
-  const usuarioLogado = localStorage.getItem('usuarioLogado');
-  if (usuarioLogado === 'true') {
-    window.location.href = 'dashboard.html';
-    return;
-  }
+  // Removemos o redirecionamento automático
+  // O login sempre será exigido ao acessar a página
 
   if (loginForm) {
     loginForm.addEventListener('submit', function(e) {
@@ -21,17 +17,20 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
       }
 
-      // Desativa o botão e mostra carregando
       btn.disabled = true;
       btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Verificando...';
 
       // Simula requisição ao servidor
       setTimeout(() => {
-        // Credenciais válidas
         const credenciaisValidas = (usuario === 'admin' && senha === 'admin123');
 
         if (credenciaisValidas) {
-          localStorage.setItem('usuarioLogado', 'true');
+          // Salva de forma estruturada no localStorage
+          const dadosUsuario = {
+            nome: usuario,
+            autenticado: true
+          };
+          localStorage.setItem('usuarioLogado', JSON.stringify(dadosUsuario));
           window.location.href = 'dashboard.html';
         } else {
           mostrarToast('Credenciais inválidas. Tente admin/admin123', 'danger');
@@ -42,7 +41,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  // Função de feedback visual (toast)
   function mostrarToast(mensagem, tipo = 'success') {
     const toastHTML = `
       <div class="position-fixed top-0 start-50 translate-middle-x p-3" style="z-index: 1055">
